@@ -439,6 +439,8 @@ docker run -d --name postgres -e POSTGRES_PASSWORD=password -p 5432:5432 --netwo
 
 - app konteynerine bağlan
 
+docker run --name app --network my_nw_1 -p 5050:5000 -d my-flask-app
+
 ```bash
 docker exec -it app bash
 ```
@@ -543,6 +545,44 @@ networks:
 volumes:
   db_data:
 ```
+for arm 
+```
+# version özelliği kaldırıldı (obsolete)
+
+services:
+  web:
+    image: nginx:alpine 
+    platform: linux/amd64  # Platform belirtme
+    ports:
+      - "8080:80"
+    volumes:
+      - html:/usr/share/nginx/html
+    networks:
+      - webnet
+
+  db:
+    image: mysql:5.7
+    platform: linux/amd64  # Platform belirtme
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: sampledb
+      MYSQL_USER: sampleuser
+      MYSQL_PASSWORD: samplepassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - webnet
+
+networks:
+  webnet:
+
+volumes:
+  db_data:
+  html:  # Bu satırı ekleyin
+```
+
 - Yeni html dosyası oluştur
 
 ```bash
@@ -597,14 +637,18 @@ tree .
 - Konteyner oluşturun ve başlatın
 
 ```bash
-docker-compose up --build -d
+docker compose up --build -d
 ```
 - Bilgisayarınızda bir tarayıcı açın ve şuraya gidin: http://localhost:8080/
 
 - Konteynerleri durdurmak için
 ```bash
-docker-compose down
+docker compose down
 ```
+
+docker exec -it my-first-compose-web-1 sh
+docker exec -it my-first-compose-db-1 mysql -u sampleuser -p sampledb
+
 
 ## Loglar, inceleme ve temizleme
 
